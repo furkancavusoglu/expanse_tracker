@@ -1,42 +1,39 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useRouter, Link } from "expo-router";
+import { View } from "react-native";
+import { useRouter } from "expo-router";
 import { useAuthStore } from "../../lib/store/auth";
+import { Screen } from "../../components/Screen";
+import { Input } from "../../components/Input";
+import { Button } from "../../components/Button";
+import { common, layout } from "../../lib/constants/styles";
 
 export default function SignUpScreen() {
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Navigation and auth
   const router = useRouter();
   const { signUp } = useAuthStore();
 
+  // Handle sign up
   const handleSignUp = async () => {
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+    if (!email || !password) {
+      setError("Please enter both email and password");
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      const { error } = await signUp(email, password);
-      if (error) throw error;
-      // Show success message and redirect to sign in
+      const { error: signUpError } = await signUp(email, password);
+
+      if (signUpError) throw signUpError;
+
       router.replace(
-        "/sign-in?message=Please check your email to confirm your account"
+        "/sign-in?message=Please verify your email before signing in"
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -46,71 +43,42 @@ export default function SignUpScreen() {
   };
 
   return (
-    <View className="flex-1 justify-center px-4 bg-white">
-      <View className="space-y-4">
-        <Text className="text-2xl font-bold text-center mb-8">
-          Create Account
-        </Text>
+    <Screen title="Create Account" error={error || undefined}>
+      <View className={common.formContainer}>
+        <Input
+          label="Email"
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
 
-        {error && (
-          <Text className="text-red-500 text-center mb-4">{error}</Text>
-        )}
+        <Input
+          label="Password"
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-        <View className="space-y-2">
-          <Text className="text-gray-600">Email</Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
+        <View className={layout.verticalGap.large}>
+          <Button
+            title="Sign Up"
+            onPress={handleSignUp}
+            loading={loading}
+            loadingText="Creating account..."
           />
-        </View>
-
-        <View className="space-y-2">
-          <Text className="text-gray-600">Password</Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-
-        <View className="space-y-2">
-          <Text className="text-gray-600">Confirm Password</Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3"
-            placeholder="Confirm your password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-        </View>
-
-        <TouchableOpacity
-          className="bg-black py-3 rounded-lg"
-          onPress={handleSignUp}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-white text-center font-semibold">
-              Sign Up
-            </Text>
-          )}
-        </TouchableOpacity>
-
-        <View className="flex-row justify-center space-x-1">
-          <Text className="text-gray-600">Already have an account?</Text>
-          <Link href="/sign-in" className="text-black font-semibold">
-            Sign In
-          </Link>
         </View>
       </View>
-    </View>
+
+      <View className={layout.verticalGap.xxlarge}>
+        <Button
+          title="Already have an account? Sign In"
+          onPress={() => router.push("/sign-in")}
+          variant="link"
+        />
+      </View>
+    </Screen>
   );
 }

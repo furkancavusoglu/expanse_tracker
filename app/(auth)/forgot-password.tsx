@@ -1,23 +1,30 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useRouter, Link } from "expo-router";
+import { View } from "react-native";
+import { useRouter } from "expo-router";
 import { useAuthStore } from "../../lib/store/auth";
+import { Screen } from "../../components/Screen";
+import { Input } from "../../components/Input";
+import { Button } from "../../components/Button";
+import { common, layout } from "../../lib/constants/styles";
 
 export default function ForgotPasswordScreen() {
+  // Form state
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Navigation and auth
   const router = useRouter();
   const { resetPassword } = useAuthStore();
 
+  // Handle reset password
   const handleResetPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -32,64 +39,53 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <View className="flex-1 justify-center px-4 bg-white">
-      <View className="space-y-4">
-        <Text className="text-2xl font-bold text-center mb-8">
-          Reset Password
-        </Text>
+    <Screen
+      title="Reset Password"
+      error={error || undefined}
+      success={
+        success
+          ? "Password reset instructions have been sent to your email."
+          : undefined
+      }
+    >
+      {success ? (
+        <View className={common.formContainer}>
+          <Button
+            title="Return to Sign In"
+            onPress={() => router.replace("/sign-in")}
+          />
+        </View>
+      ) : (
+        <View className={common.formContainer}>
+          <Input
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
-        {error && (
-          <Text className="text-red-500 text-center mb-4">{error}</Text>
-        )}
-
-        {success ? (
-          <View className="space-y-4">
-            <Text className="text-green-500 text-center">
-              Password reset instructions have been sent to your email.
-            </Text>
-            <TouchableOpacity
-              className="bg-black py-3 rounded-lg"
-              onPress={() => router.replace("/sign-in")}
-            >
-              <Text className="text-white text-center font-semibold">
-                Return to Sign In
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <>
-            <View className="space-y-2">
-              <Text className="text-gray-600">Email</Text>
-              <TextInput
-                className="border border-gray-300 rounded-lg p-3"
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-            </View>
-
-            <TouchableOpacity
-              className="bg-black py-3 rounded-lg"
+          <View className={layout.verticalGap.large}>
+            <Button
+              title="Send Reset Instructions"
               onPress={handleResetPassword}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text className="text-white text-center font-semibold">
-                  Send Reset Instructions
-                </Text>
-              )}
-            </TouchableOpacity>
-          </>
-        )}
+              loading={loading}
+              loadingText="Sending instructions..."
+            />
+          </View>
+        </View>
+      )}
 
-        <Link href="/sign-in" className="text-black text-center">
-          Back to Sign In
-        </Link>
-      </View>
-    </View>
+      {!success && (
+        <View className={layout.verticalGap.xxlarge}>
+          <Button
+            title="Back to Sign In"
+            onPress={() => router.push("/sign-in")}
+            variant="link"
+          />
+        </View>
+      )}
+    </Screen>
   );
 }

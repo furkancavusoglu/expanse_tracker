@@ -4,10 +4,12 @@ import { useEffect } from "react";
 import { useRouter, useSegments } from "expo-router";
 
 export default function AppLayout() {
+  // Auth state
   const { user, loading } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
 
+  // Auth navigation effect
   useEffect(() => {
     if (!loading) {
       // Check if user is not authenticated and trying to access app screens
@@ -22,6 +24,9 @@ export default function AppLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        contentStyle: {
+          backgroundColor: "white",
+        },
       }}
     />
   );
