@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter, Link, useLocalSearchParams } from "expo-router";
-import { useAuth } from "../../lib/context/auth";
+import { useAuthStore } from "../../lib/store/auth";
 
 export default function SignInScreen() {
   const [email, setEmail] = useState("");
@@ -15,16 +15,27 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn } = useAuthStore();
   const { message } = useLocalSearchParams<{ message: string }>();
 
   const handleSignIn = async () => {
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
-      const { error } = await signIn(email, password);
-      if (error) throw error;
-      router.replace("/(app)");
+      const { error: signInError, data } = await signIn(email, password);
+
+      if (signInError) throw signInError;
+
+      if (data.session) {
+        router.replace("/(app)");
+      } else {
+        setError("Failed to sign in. Please try again.");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

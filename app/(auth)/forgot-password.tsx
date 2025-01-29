@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
-import { useAuth } from "../../lib/context/auth";
+import { useAuthStore } from "../../lib/store/auth";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -15,7 +15,7 @@ export default function ForgotPasswordScreen() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const { resetPassword } = useAuth();
+  const { resetPassword } = useAuthStore();
 
   const handleResetPassword = async () => {
     try {

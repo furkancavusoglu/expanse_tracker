@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
-import { useAuth } from "../../lib/context/auth";
+import { useAuthStore } from "../../lib/store/auth";
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signUp } = useAuthStore();
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {

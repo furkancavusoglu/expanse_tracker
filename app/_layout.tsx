@@ -1,13 +1,8 @@
 import { Stack } from "expo-router";
-import { AuthProvider } from "../lib/context/auth";
 import "../global.css";
 
 export default function RootLayout() {
-  return (
-    <AuthProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-    </AuthProvider>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

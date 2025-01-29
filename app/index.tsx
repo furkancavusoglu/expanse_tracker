@@ -1,8 +1,29 @@
 import { Redirect } from "expo-router";
-import { useAuth } from "../lib/context/auth";
+import { useAuthStore } from "../lib/store/auth";
+import { useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Index() {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser, setSession, setLoading } = useAuthStore();
+
+  useEffect(() => {
+    // Check active sessions and subscribe to auth changes
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // While loading, don't render anything
   if (loading) return null;

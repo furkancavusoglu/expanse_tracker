@@ -1,8 +1,17 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { useAuth } from "../../lib/context/auth";
+import { useAuthStore } from "../../lib/store/auth";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
-  const { signOut } = useAuth();
+  const { signOut } = useAuthStore();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (!error) {
+      router.replace("/(auth)/sign-in");
+    }
+  };
 
   return (
     <View className="flex-1 items-center justify-center bg-white">
@@ -11,7 +20,7 @@ export default function HomeScreen() {
       </Text>
       <TouchableOpacity
         className="bg-black py-3 px-6 rounded-lg"
-        onPress={() => signOut()}
+        onPress={handleSignOut}
       >
         <Text className="text-white font-semibold">Sign Out</Text>
       </TouchableOpacity>
