@@ -6,9 +6,9 @@ import { Platform } from "react-native";
 
 // Get the URL prefix for deep linking
 const prefix = Platform.select({
-  ios: Linking.createURL("auth/callback"),
-  android: Linking.createURL("auth/callback"),
-  web: "http://localhost:8081/auth/callback",
+  ios: Linking.createURL("(auth)/callback"),
+  android: Linking.createURL("(auth)/callback"),
+  web: "http://localhost:8081/(auth)/callback",
 });
 
 interface AuthState {
