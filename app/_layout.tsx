@@ -1,7 +1,15 @@
 import { Stack } from "expo-router";
 import "../global.css";
+import { useEffect } from "react";
+import { useAuthStore } from "../lib/store/auth";
 
 export default function RootLayout() {
+  const initialize = useAuthStore((state) => state.initialize);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   return <Stack screenOptions={{ headerShown: false }} />;
 }
 
