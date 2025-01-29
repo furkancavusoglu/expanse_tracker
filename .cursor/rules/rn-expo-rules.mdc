@@ -1,0 +1,5 @@
+---
+description: react-native-rule
+globs: *.ts, *.tsx, *.js,*.md
+---
+[cursorrules](mdc:cursorrules)
